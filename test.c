@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include <stdint.h>
-#include <memory.h>
 #include <string.h>
 #include "sha256.h"
+#include "stdint.h"
 
 int print_hex(char *tips, uint8_t *hex, int size)
 {
