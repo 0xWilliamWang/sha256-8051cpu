@@ -12,12 +12,12 @@ uint32_t k[64] = {
     0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 
-void sha256_transform(SHA256_CTX *ctx, uint8_t data[])
+void sha256_transform(SHA256_CTX *ctx, uint8_t block[])
 {
    uint32_t a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
 
    for (i = 0, j = 0; i < 16; ++i, j += 4)
-      m[i] = (data[j] << 24) | (data[j + 1] << 16) | (data[j + 2] << 8) | (data[j + 3]);
+      m[i] = (block[j] << 24) | (block[j + 1] << 16) | (block[j + 2] << 8) | (block[j + 3]);
    for (; i < 64; ++i)
       m[i] = SIG1(m[i - 2]) + m[i - 7] + SIG0(m[i - 15]) + m[i - 16];
 
@@ -69,17 +69,17 @@ void sha256_init(SHA256_CTX *ctx)
    ctx->state[7] = 0x5be0cd19;
 }
 
-void sha256_update(SHA256_CTX *ctx, uint8_t data[], uint32_t len)
+void sha256_update(SHA256_CTX *ctx, uint8_t block[], uint32_t len)
 {
    uint32_t t, i;
 
    for (i = 0; i < len; ++i)
    {
-      ctx->data[ctx->datalen] = data[i];
+      ctx->block[ctx->datalen] = block[i];
       ctx->datalen++;
       if (ctx->datalen == 64)
       {
-         sha256_transform(ctx, ctx->data);
+         sha256_transform(ctx, ctx->block);
          DBL_INT_ADD(ctx->bitlen[0], ctx->bitlen[1], 512);
          ctx->datalen = 0;
       }
@@ -92,33 +92,33 @@ void sha256_final(SHA256_CTX *ctx, uint8_t hash[])
 
    i = ctx->datalen;
 
-   /*Pad whatever data is left in the buffer.*/
+   /*Pad whatever block is left in the buffer.*/
    if (ctx->datalen < 56)
    {
-      ctx->data[i++] = 0x80;
+      ctx->block[i++] = 0x80;
       while (i < 56)
-         ctx->data[i++] = 0x00;
+         ctx->block[i++] = 0x00;
    }
    else
    {
-      ctx->data[i++] = 0x80;
+      ctx->block[i++] = 0x80;
       while (i < 64)
-         ctx->data[i++] = 0x00;
-      sha256_transform(ctx, ctx->data);
-      memset(ctx->data, 0, 56);
+         ctx->block[i++] = 0x00;
+      sha256_transform(ctx, ctx->block);
+      memset(ctx->block, 0, 56);
    }
 
    /* Append to the padding the total message's length in bits and transform.*/
    DBL_INT_ADD(ctx->bitlen[0], ctx->bitlen[1], ctx->datalen * 8);
-   ctx->data[63] = ctx->bitlen[0];
-   ctx->data[62] = ctx->bitlen[0] >> 8;
-   ctx->data[61] = ctx->bitlen[0] >> 16;
-   ctx->data[60] = ctx->bitlen[0] >> 24;
-   ctx->data[59] = ctx->bitlen[1];
-   ctx->data[58] = ctx->bitlen[1] >> 8;
-   ctx->data[57] = ctx->bitlen[1] >> 16;
-   ctx->data[56] = ctx->bitlen[1] >> 24;
-   sha256_transform(ctx, ctx->data);
+   ctx->block[63] = ctx->bitlen[0];
+   ctx->block[62] = ctx->bitlen[0] >> 8;
+   ctx->block[61] = ctx->bitlen[0] >> 16;
+   ctx->block[60] = ctx->bitlen[0] >> 24;
+   ctx->block[59] = ctx->bitlen[1];
+   ctx->block[58] = ctx->bitlen[1] >> 8;
+   ctx->block[57] = ctx->bitlen[1] >> 16;
+   ctx->block[56] = ctx->bitlen[1] >> 24;
+   sha256_transform(ctx, ctx->block);
 
    /* Since this implementation uses little endian byte ordering and SHA uses big endian,
     reverse all the bytes when copying the final state to the output hash.*/
