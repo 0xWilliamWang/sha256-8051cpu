@@ -4,6 +4,29 @@
 #include "sha256.h"
 #include "stdint.h"
 
+
+void printHex8(char *tips, uint8_t *hex, uint32_t len)
+{
+	uint32_t i = 0;
+	printf("%s: ", tips);
+	for (; i < len; i++)
+	{
+		printf("0x%.2x,", hex[i]);
+	}
+	printf("\n");
+}
+
+void printHex32(char *tips, uint32_t *hex, uint32_t len)
+{
+	uint32_t i = 0;
+	printf("%s: ", tips);
+	for (; i < len; i++)
+	{
+		printf("0x%.8x,", hex[i]);
+	}
+	printf("\n");
+}
+
 void test_base_op()
 {
 	int i = 0;
@@ -16,17 +39,17 @@ void test_base_op()
 	assert(num[0] == 0x3A738678);
 
 	/*     MAJ       */
-	i=0;
+	i = 0;
 	num[i++] = MAJ(num1, num2, num3);
 	assert(num[0] == 0x12368678);
 
 	/*     DBL_INT_ADD       */
-	i=0;
+	i = 0;
 	DBL_INT_ADD(num[0], num2, num3);
 	assert(num[0] == 0x3A9E0CF0);
 
 	/*     EPx       */
-	i=0;
+	i = 0;
 	num[i++] = EP0(num1);
 	num[i++] = EP0(num2);
 	num[i++] = EP0(num3);
@@ -34,7 +57,7 @@ void test_base_op()
 	num[i++] = EP1(num2);
 	num[i++] = EP1(num3);
 
-	i=0;
+	i = 0;
 	assert(num[i++] == 0x66146474);
 	assert(num[i++] == 0xfd55d042);
 	assert(num[i++] == 0xa7c14203);
@@ -43,7 +66,7 @@ void test_base_op()
 	assert(num[i++] == 0x1c67aefd);
 
 	/*     SIGx       */
-	i=0;
+	i = 0;
 	num[i++] = SIG0(num1);
 	num[i++] = SIG0(num2);
 	num[i++] = SIG0(num3);
@@ -51,16 +74,16 @@ void test_base_op()
 	num[i++] = SIG1(num2);
 	num[i++] = SIG1(num3);
 
-	i=0;
+	i = 0;
 	assert(num[i++] == 0xe7fce6ee);
 	assert(num[i++] == 0x53fc314f);
 	assert(num[i++] == 0x14c235da);
 	assert(num[i++] == 0xa1f78649);
 	assert(num[i++] == 0x13f787fe);
 	assert(num[i++] == 0x33f908de);
-	
+
 	/*     ROTATE       */
-	i=0;
+	i = 0;
 	num[i++] = ROTLEFT(num1, 4);
 	num[i++] = ROTLEFT(num1, 8);
 	num[i++] = ROTLEFT(num1, 12);
@@ -88,13 +111,33 @@ void test_base_op()
 
 void sha256_test1()
 {
+	uint8_t t = 0;
 	uint8_t text1[] = {"abc"};
 	uint8_t hash1[SHA256_BLOCK_SIZE] = {0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea, 0x41, 0x41, 0x40, 0xde, 0x5d, 0xae, 0x22, 0x23,
 										0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c, 0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad};
 	uint8_t buf[SHA256_BLOCK_SIZE];
+
+	uint32_t ctx_state[8] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
+	uint8_t ctx_block[64] = {
+		0x80, 0x03, 0x00, 0x00, 0x80, 0x03, 0x00, 0x00,
+		0x80, 0x03, 0x00, 0x00, 0x80, 0x03, 0x00, 0x00,
+		0x80, 0x03, 0x00, 0x00, 0x80, 0x03, 0x00, 0x00,
+		0x80, 0x03, 0x00, 0x00, 0x80, 0x03, 0x00, 0x00,
+		0x80, 0x03, 0x00, 0x00, 0x80, 0x03, 0x00, 0x00,
+		0x80, 0x03, 0x00, 0x00, 0x80, 0x03, 0x00, 0x00,
+		0x80, 0x03, 0x00, 0x00, 0x80, 0x03, 0x00, 0x00,
+		0x80, 0x03, 0x00, 0x00, 0x80, 0x03, 0x00, 0x00};
+
 	SHA256_CTX ctx;
 	sha256_init(&ctx);
+	assert(memcmp(ctx_state, ctx.state, sizeof(ctx_state)) == 0);
+	assert(ctx.datalen == 0);
+	assert(ctx.bitlen[0] == 0);
+	assert(ctx.bitlen[1] == 0);
+
 	sha256_update(&ctx, text1, strlen(text1));
+	assert(memcmp(ctx_state, ctx.state, sizeof(ctx_state)) == 0);
+
 	sha256_final(&ctx, buf);
 	assert(memcmp(hash1, buf, SHA256_BLOCK_SIZE) == 0);
 }
