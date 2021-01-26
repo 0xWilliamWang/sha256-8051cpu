@@ -3,7 +3,7 @@
 #include "sha256.h"
 #include "stdint.h"
 
-int print_hex(char *tips, uint8_t *hex, int size)
+void print_hex(char *tips, uint8_t *hex, int size)
 {
 	int i = 0;
 	printf("%s: ", tips);
@@ -14,7 +14,7 @@ int print_hex(char *tips, uint8_t *hex, int size)
 	printf("\n");
 }
 
-int test_base_op()
+void test_base_op()
 {
 	int i = 0;
 	uint32_t num[10] = {0};
@@ -33,7 +33,7 @@ int test_base_op()
 	num[i++] = ROTRIGHT(num1, 24);
 }
 
-int sha256_test1()
+void sha256_test1()
 {
 	uint8_t text1[] = {"abc"};
 	uint8_t hash1[SHA256_BLOCK_SIZE] = {0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea, 0x41, 0x41, 0x40, 0xde, 0x5d, 0xae, 0x22, 0x23,
@@ -50,7 +50,7 @@ int sha256_test1()
 	pass = pass && !memcmp(hash1, buf, SHA256_BLOCK_SIZE);
 }
 
-int sha256_test()
+void sha256_test()
 {
 	uint8_t text2[] = {"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"};
 	uint8_t text3[] = {"aaaaaaaaaa"};
@@ -60,7 +60,6 @@ int sha256_test()
 										0xf1, 0x80, 0x9a, 0x48, 0xa4, 0x97, 0x20, 0x0e, 0x04, 0x6d, 0x39, 0xcc, 0xc7, 0x11, 0x2c, 0xd0};
 	uint8_t buf[SHA256_BLOCK_SIZE];
 	SHA256_CTX ctx;
-	int idx;
 	int pass = 1;
 	sha256_init(&ctx);
 	sha256_update(&ctx, text2, strlen(text2));
@@ -73,8 +72,6 @@ int sha256_test()
 	sha256_final(&ctx, buf);
 	print_hex("text3", buf, SHA256_BLOCK_SIZE);
 	pass = pass && !memcmp(hash3, buf, SHA256_BLOCK_SIZE);
-
-	return (pass);
 }
 
 void test_data_type(void)
@@ -130,5 +127,5 @@ int main()
 	test_base_op();
 	sha256_test1();
 	sha256_test();
-	return (0);
+	return 0;
 }

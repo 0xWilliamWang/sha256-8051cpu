@@ -71,7 +71,7 @@ void sha256_init(SHA256_CTX *ctx)
 
 void sha256_update(SHA256_CTX *ctx, uint8_t block[], uint32_t len)
 {
-   uint32_t t, i;
+   uint32_t i;
 
    for (i = 0; i < len; ++i)
    {
