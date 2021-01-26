@@ -5,4 +5,4 @@ test:
 > ./$@.out
 
 clean:
-> rm *.out *.exe
+> rm -f *.out *.exe
