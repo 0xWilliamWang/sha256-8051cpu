@@ -17,3 +17,6 @@
     sha256_final(&ctx, result);
     ```
 1. compile project with `sha256.c`
+
+![](img1.png)
+![](img2.png)

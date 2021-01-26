@@ -54,3 +54,4 @@ Objects
 Listings
 *.uvgui.*
 *.uvopt
+tmp.*
