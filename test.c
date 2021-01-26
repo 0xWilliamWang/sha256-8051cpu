@@ -1,20 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "sha256.h"
 #include "stdint.h"
 
-void print_hex(char *tips, uint8_t *hex, int size)
-{
-	int i = 0;
-	printf("%s: ", tips);
-	for (; i < size; i++)
-	{
-		printf("%.2x", hex[i]);
-	}
-	printf("\n");
-}
-
-void test_base_op()
+void test_rotate_left_right()
 {
 	int i = 0;
 	uint32_t num[10] = {0};
@@ -26,11 +16,23 @@ void test_base_op()
 	num[i++] = ROTLEFT(num1, 16);
 	num[i++] = ROTLEFT(num1, 24);
 
+	assert(num[0] == 0x23456781);
+	assert(num[1] == 0x34567812);
+	assert(num[2] == 0x45678123);
+	assert(num[3] == 0x56781234);
+	assert(num[4] == 0x78123456);
+
 	num[i++] = ROTRIGHT(num1, 4);
 	num[i++] = ROTRIGHT(num1, 8);
 	num[i++] = ROTRIGHT(num1, 12);
 	num[i++] = ROTRIGHT(num1, 16);
 	num[i++] = ROTRIGHT(num1, 24);
+
+	assert(num[5 + 0] == 0x81234567);
+	assert(num[5 + 1] == 0x78123456);
+	assert(num[5 + 2] == 0x67812345);
+	assert(num[5 + 3] == 0x56781234);
+	assert(num[5 + 4] == 0x34567812);
 }
 
 void sha256_test1()
@@ -40,38 +42,37 @@ void sha256_test1()
 										0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c, 0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad};
 	uint8_t buf[SHA256_BLOCK_SIZE];
 	SHA256_CTX ctx;
-	int pass = 1;
-	int tmp = 0;
-	tmp = sizeof(ctx.bitlen);
 	sha256_init(&ctx);
 	sha256_update(&ctx, text1, strlen(text1));
 	sha256_final(&ctx, buf);
-	print_hex("text1", buf, SHA256_BLOCK_SIZE);
-	pass = pass && !memcmp(hash1, buf, SHA256_BLOCK_SIZE);
+	assert(memcmp(hash1, buf, SHA256_BLOCK_SIZE) == 0);
 }
 
 void sha256_test()
 {
 	uint8_t text2[] = {"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"};
 	uint8_t text3[] = {"aaaaaaaaaa"};
-	uint8_t hash2[SHA256_BLOCK_SIZE] = {0x24, 0x8d, 0x6a, 0x61, 0xd2, 0x06, 0x38, 0xb8, 0xe5, 0xc0, 0x26, 0x93, 0x0c, 0x3e, 0x60, 0x39,
-										0xa3, 0x3c, 0xe4, 0x59, 0x64, 0xff, 0x21, 0x67, 0xf6, 0xec, 0xed, 0xd4, 0x19, 0xdb, 0x06, 0xc1};
-	uint8_t hash3[SHA256_BLOCK_SIZE] = {0xcd, 0xc7, 0x6e, 0x5c, 0x99, 0x14, 0xfb, 0x92, 0x81, 0xa1, 0xc7, 0xe2, 0x84, 0xd7, 0x3e, 0x67,
-										0xf1, 0x80, 0x9a, 0x48, 0xa4, 0x97, 0x20, 0x0e, 0x04, 0x6d, 0x39, 0xcc, 0xc7, 0x11, 0x2c, 0xd0};
+	uint8_t hash2[SHA256_BLOCK_SIZE] = {0x24, 0x8d, 0x6a, 0x61, 0xd2, 0x06, 0x38, 0xb8,
+										0xe5, 0xc0, 0x26, 0x93, 0x0c, 0x3e, 0x60, 0x39,
+										0xa3, 0x3c, 0xe4, 0x59, 0x64, 0xff, 0x21, 0x67,
+										0xf6, 0xec, 0xed, 0xd4, 0x19, 0xdb, 0x06, 0xc1};
+	uint8_t hash3[SHA256_BLOCK_SIZE] = {0xbf, 0x2c, 0xb5, 0x8a, 0x68, 0xf6, 0x84, 0xd9,
+										0x5a, 0x3b, 0x78, 0xef, 0x8f, 0x66, 0x1c, 0x9a,
+										0x4e, 0x5b, 0x09, 0xe8, 0x2c, 0xc8, 0xf9, 0xcc,
+										0x88, 0xcc, 0xe9, 0x05, 0x28, 0xca, 0xeb, 0x27};
+
 	uint8_t buf[SHA256_BLOCK_SIZE];
 	SHA256_CTX ctx;
 	int pass = 1;
 	sha256_init(&ctx);
 	sha256_update(&ctx, text2, strlen(text2));
 	sha256_final(&ctx, buf);
-	print_hex("text2", buf, SHA256_BLOCK_SIZE);
-	pass = pass && !memcmp(hash2, buf, SHA256_BLOCK_SIZE);
+	assert(memcmp(hash2, buf, SHA256_BLOCK_SIZE) == 0);
 
 	sha256_init(&ctx);
 	sha256_update(&ctx, text3, strlen(text3));
 	sha256_final(&ctx, buf);
-	print_hex("text3", buf, SHA256_BLOCK_SIZE);
-	pass = pass && !memcmp(hash3, buf, SHA256_BLOCK_SIZE);
+	assert(memcmp(hash3, buf, SHA256_BLOCK_SIZE) == 0);
 }
 
 void test_data_type(void)
@@ -81,7 +82,10 @@ void test_data_type(void)
 	len[i++] = sizeof(int);
 	len[i++] = sizeof(uint8_t);
 	len[i++] = sizeof(uint32_t);
-	i++;
+
+	assert(len[0] == 4);
+	assert(len[1] == 1);
+	assert(len[2] == 4);
 }
 
 /*测试uint32数据的自增和溢出*/
@@ -124,8 +128,9 @@ int main()
 {
 	test_data_type();
 	test_uint32();
-	test_base_op();
+	test_rotate_left_right();
 	sha256_test1();
 	sha256_test();
+	printf("test passed!\n");
 	return 0;
 }
