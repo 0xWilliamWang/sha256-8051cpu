@@ -3,13 +3,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-
-typedef enum {
-    LITTLE,
-    BIG,
-    UNKNOWN
-} endian_t;
-
+/*for debug*/
 void print_hex_uint8(char* tips, uint8_t* hex, uint32_t len) {
     uint32_t i = 0;
     printf("%s: ", tips);
@@ -19,6 +13,7 @@ void print_hex_uint8(char* tips, uint8_t* hex, uint32_t len) {
     printf("\n");
 }
 
+/*for debug*/
 void print_hex_uint32(char* tips, uint32_t* hex, uint32_t len) {
     uint32_t i = 0;
     printf("%s: ", tips);
@@ -169,71 +164,13 @@ void sha256_test() {
     assert(memcmp(hash3, buf, SHA256_BLOCK_SIZE) == 0);
 }
 
-void test_little_or_big_endian(void) {
-    /*00000000 00000001 00000000 00000010*/
-    uint32_t num = 65538;
-    /* 4 */
-    char* ptr = (char*)&num;
-    endian_t endian = UNKNOWN;
-    /* 第1个字节的内容是1则是小端字节序，为0则是大端字节序	 */
-    if (*ptr == 2 && *(ptr + 1) == 0 && *(ptr + 2) == 1 && *(ptr + 3) == 0) {
-        endian = LITTLE;
-    }
-    else if (*ptr == 0 && *(ptr + 1) == 1 && *(ptr + 2) == 0 && *(ptr + 3) == 2) {
-        endian = BIG;
-    }
-}
-
 void test_data_type(void) {
-    int i = 0;
-    int len[4];
-    len[i++] = sizeof(int);
-    len[i++] = sizeof(uint8_t);
-    len[i++] = sizeof(uint32_t);
-
-    assert(len[1] == 1);
-    assert(len[2] == 4);
-}
-
-/*测试uint32数据的自增和溢出*/
-void test_uint32(void) {
-    uint32_t num1 = 0x11111111;
-    uint32_t num2 = 0xffffffff;
-    SHA256_CTX ctx;
-
-    num1++;
-    num1++;
-    num1++;
-    num1++;
-
-    num2++;
-    num2++;
-    num2++;
-    num2++;
-
-    ctx.state[0] = 0x6a09e667;
-    ctx.state[1] = 0xbb67ae85;
-    ctx.state[2] = 0x3c6ef372;
-    ctx.state[3] = 0xa54ff53a;
-    ctx.state[4] = 0x510e527f;
-    ctx.state[5] = 0x9b05688c;
-    ctx.state[6] = 0x1f83d9ab;
-    ctx.state[7] = 0x5be0cd19;
-
-    ctx.state[0] += ctx.state[0];
-    ctx.state[1] += ctx.state[1];
-    ctx.state[2] += ctx.state[2];
-    ctx.state[3] += ctx.state[3];
-    ctx.state[4] += ctx.state[4];
-    ctx.state[5] += ctx.state[5];
-    ctx.state[6] += ctx.state[6];
-    ctx.state[7] += ctx.state[7];
+    assert(sizeof(uint8_t) == 1);
+    assert(sizeof(uint32_t) == 4);
 }
 
 int main() {
-    test_little_or_big_endian();
     test_data_type();
-    test_uint32();
     test_base_op();
     sha256_test1();
     sha256_test();
