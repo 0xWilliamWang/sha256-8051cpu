@@ -4,7 +4,7 @@
 #include <string.h>
 #include "sha256.h"
 
-int print_hex(char *tips, unsigned char *hex, int size)
+int print_hex(char *tips, uint8_t *hex, int size)
 {
 	int i = 0;
 	printf("%s: ", tips);
@@ -78,6 +78,16 @@ int sha256_test()
 	return (pass);
 }
 
+void test_data_type(void)
+{
+	int i = 0;
+	int len[4];
+	len[i++] = sizeof(int);
+	len[i++] = sizeof(uint8_t);
+	len[i++] = sizeof(uint32_t);
+	i++;
+}
+
 /*测试uint32数据的自增和溢出*/
 void test_uint32(void)
 {
@@ -116,6 +126,7 @@ void test_uint32(void)
 
 int main()
 {
+	test_data_type();
 	test_uint32();
 	test_base_op();
 	sha256_test1();
