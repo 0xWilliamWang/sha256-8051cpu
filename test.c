@@ -4,6 +4,12 @@
 #include "sha256.h"
 #include "stdint.h"
 
+typedef enum e
+{
+	LITTLE,
+	BIG,
+	UNKNOWN
+} endian_t;
 
 void printHex8(char *tips, uint8_t *hex, uint32_t len)
 {
@@ -169,6 +175,24 @@ void sha256_test()
 	assert(memcmp(hash3, buf, SHA256_BLOCK_SIZE) == 0);
 }
 
+void test_little_or_big_endian(void)
+{
+	/*00000000 00000001 00000000 00000010*/
+	uint32_t num = 65538;
+	/* 4 */
+	char *ptr = (char *)&num;
+	endian_t endian = UNKNOWN;
+	/* 第1个字节的内容是1则是小端字节序，为0则是大端字节序	 */
+	if (*ptr == 2 && *(ptr + 1) == 0 && *(ptr + 2) == 1 && *(ptr + 3) == 0)
+	{
+		endian = LITTLE;
+	}
+	else if (*ptr == 0 && *(ptr + 1) == 1 && *(ptr + 2) == 0 && *(ptr + 3) == 2)
+	{
+		endian = BIG;
+	}
+}
+
 void test_data_type(void)
 {
 	int i = 0;
@@ -219,6 +243,7 @@ void test_uint32(void)
 
 int main()
 {
+	test_little_or_big_endian();
 	test_data_type();
 	test_uint32();
 	test_base_op();
