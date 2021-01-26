@@ -93,7 +93,7 @@ void sha256_final(SHA256_CTX *ctx, uint8_t hash[])
 
    i = ctx->datalen;
 
-   // Pad whatever data is left in the buffer.
+   /*Pad whatever data is left in the buffer.*/
    if (ctx->datalen < 56)
    {
       ctx->data[i++] = 0x80;
@@ -109,7 +109,7 @@ void sha256_final(SHA256_CTX *ctx, uint8_t hash[])
       memset(ctx->data, 0, 56);
    }
 
-   // Append to the padding the total message's length in bits and transform.
+   /* Append to the padding the total message's length in bits and transform.*/
    DBL_INT_ADD(ctx->bitlen[0], ctx->bitlen[1], ctx->datalen * 8);
    ctx->data[63] = ctx->bitlen[0];
    ctx->data[62] = ctx->bitlen[0] >> 8;
@@ -121,8 +121,8 @@ void sha256_final(SHA256_CTX *ctx, uint8_t hash[])
    ctx->data[56] = ctx->bitlen[1] >> 24;
    sha256_transform(ctx, ctx->data);
 
-   // Since this implementation uses little endian byte ordering and SHA uses big endian,
-   // reverse all the bytes when copying the final state to the output hash.
+   /* Since this implementation uses little endian byte ordering and SHA uses big endian,
+    reverse all the bytes when copying the final state to the output hash.*/
    for (i = 0; i < 4; ++i)
    {
       hash[i] = (ctx->state[0] >> (24 - i * 8)) & 0x000000ff;

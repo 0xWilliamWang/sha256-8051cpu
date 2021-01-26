@@ -1,17 +1,3 @@
-/*********************************************************************
-* Filename:   sha256.c
-* Author:     Brad Conte (brad AT bradconte.com)
-* Copyright:
-* Disclaimer: This code is presented "as is" without any guarantees.
-* Details:    Performs known-answer tests on the corresponding SHA1
-	          implementation. These tests do not encompass the full
-	          range of available test vectors, however, if the tests
-	          pass it is very, very likely that the code is correct
-	          and was compiled properly. This code also serves as
-	          example usage of the functions.
-*********************************************************************/
-
-/*************************** HEADER FILES ***************************/
 #include <stdio.h>
 #include <stdint.h>
 #include <memory.h>
@@ -20,8 +6,9 @@
 
 int print_hex(char *tips, unsigned char *hex, int size)
 {
+	int i = 0;
 	printf("%s: ", tips);
-	for (int i = 0; i < size; i++)
+	for (; i < size; i++)
 	{
 		printf("%.2x", hex[i]);
 	}
@@ -31,7 +18,7 @@ int print_hex(char *tips, unsigned char *hex, int size)
 int test_base_op()
 {
 	int i = 0;
-	uint32_t num[10]={0};
+	uint32_t num[10] = {0};
 	uint32_t num1 = 0x12345678;
 
 	num[i++] = ROTLEFT(num1, 4);
@@ -83,7 +70,6 @@ int sha256_test()
 	pass = pass && !memcmp(hash2, buf, SHA256_BLOCK_SIZE);
 
 	sha256_init(&ctx);
-	// for (idx = 0; idx < 100000; ++idx)
 	sha256_update(&ctx, text3, strlen(text3));
 	sha256_final(&ctx, buf);
 	print_hex("text3", buf, SHA256_BLOCK_SIZE);
@@ -92,7 +78,7 @@ int sha256_test()
 	return (pass);
 }
 
-// 测试uint32数据的自增和溢出
+/*测试uint32数据的自增和溢出*/
 void test_uint32(void)
 {
 	uint32_t num1 = 0x11111111;
