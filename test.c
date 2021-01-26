@@ -11,7 +11,7 @@ typedef enum e
 	UNKNOWN
 } endian_t;
 
-void printHex8(char *tips, uint8_t *hex, uint32_t len)
+void print_hex_uint8(char *tips, uint8_t *hex, uint32_t len)
 {
 	uint32_t i = 0;
 	printf("%s: ", tips);
@@ -22,7 +22,7 @@ void printHex8(char *tips, uint8_t *hex, uint32_t len)
 	printf("\n");
 }
 
-void printHex32(char *tips, uint32_t *hex, uint32_t len)
+void print_hex_uint32(char *tips, uint32_t *hex, uint32_t len)
 {
 	uint32_t i = 0;
 	printf("%s: ", tips);
